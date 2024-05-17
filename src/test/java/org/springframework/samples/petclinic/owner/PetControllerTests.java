@@ -70,6 +70,15 @@ class PetControllerTests {
 	}
 
 	@Test
+	void testAddNewPet() throws Exception {
+		mockMvc
+			.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID).param("name", "Buck")
+				.param("type", "gorilla")
+				.param("birthDate", "2010-01-01"))
+			.andExpect(status().isOk());
+	}
+
+	@Test
 	void testInitCreationForm() throws Exception {
 		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
 			.andExpect(status().isOk())
