@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         // Définir les variables d'environnement si nécessaire
-        GIT_URL = 'https://github.com/spring-projects/spring-petclinic.git'
+        GIT_URL = 'https://github.com/AlexTHELEGOFAN/PetClinic'
         PROJECT_DIR = 'Nodes---Github-Push'
     }
 
