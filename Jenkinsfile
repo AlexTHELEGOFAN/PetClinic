@@ -1,14 +1,14 @@
 pipeline {
     agent any
-    
+
     environment {
         // Définir les variables d'environnement si nécessaire
         GIT_URL = 'https://github.com/AlexTHELEGOFAN/PetClinic'
-        PROJECT_DIR = 'Nodes---Github-Push'
+        PROJECT_DIR = 'PetClinic'
     }
 
     stages {
-        stage('Prepare Classses') {
+        stage('Prepare Classes') {
             steps {
                 script {
                     // Vérifier si le dossier existe et le nettoyer
@@ -36,49 +36,54 @@ pipeline {
                 script {
                     // Cloner le dépôt Git
                     if (isUnix()) {
-                        sh "git clone ${GIT_URL}"
+                        sh "git clone ${GIT_URL} ${PROJECT_DIR}"
                     } else {
-                        powershell "git clone ${GIT_URL}"
+                        powershell "git clone ${GIT_URL} ${PROJECT_DIR}"
                     }
                 }
             }
         }
         
-        stage('Install Dependencies') {
+        stage('Install Dependencies and Build') {
             steps {
                 script {
                     dir("${PROJECT_DIR}") {
-                        // Exécuter npm install dans le répertoire du projet cloné
-                        powershell 'mvn clean install'
+                        // Exécuter Maven Clean Install
+                        if (isUnix()) {
+                            sh 'mvn clean install'
+                        } else {
+                            powershell 'mvn clean install'
+                        }
                     }
                 }
             }
         }
 
-        stage('Tests') {
+        stage('Run Tests') {
             steps {
                 script {
                     dir("${PROJECT_DIR}") {
-                        
-                        powershell 'mvn test'
+                        // Exécuter Maven Test
+                        if (isUnix()) {
+                            sh 'mvn test'
+                        } else {
+                            powershell 'mvn test'
+                        }
                     }
                 }
             }
         }
     
     }
-    // autres configurations
     
     post {
         always {
-            script {
-                dir("${PROJECT_DIR}/test_results") {
-                    junit 'junit.xml'
-                }
-            }
+            // Publier les résultats des tests JUnit
+            junit '**/target/surefire-reports/*.xml'
+
             echo 'Sending email notification...'
-            // Configurer pour envoyer des emails ici
+            // Configurer pour envoyer des emails ici, si nécessaire
+            // mail subject: 'Test Report', body: 'See the detailed test report here.'
         }
     }
 }
-
